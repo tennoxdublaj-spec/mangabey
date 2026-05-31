@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MangaBey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1f1f1f;--border:#2a2a2a;
+  --text:#f0f0f0;--muted:#888;--accent:#c084fc;--accent2:#7c3aed;
+  --red:#ef4444;--green:#22c55e;--yellow:#eab308;
+}
+body.light{
+  --bg:#f4f4f8;--bg2:#ffffff;--bg3:#ebebf0;--border:#ddd;
+  --text:#111;--muted:#777;--accent:#7c3aed;--accent2:#6d28d9;
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans',sans-serif;min-height:100vh;transition:background .2s,color .2s}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+
+/* HEADER */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:200}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent)}
+.logo span{color:var(--text)}
+.header-right{display:flex;align-items:center;gap:8px}
+.nav{display:flex;gap:4px}
+.nav-btn{background:none;border:none;color:var(--muted);padding:8px 12px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:6px;transition:all .15s}
+.nav-btn:hover,.nav-btn.active{background:var(--bg3);color:var(--text)}
+.nav-btn.active{color:var(--accent)}
+.notif-dot{width:6px;height:6px;background:var(--red);border-radius:50%;margin-top:-8px;margin-left:-4px}
+.theme-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 10px;border-radius:8px;font-size:16px;transition:all .15s}
+.theme-btn:hover{background:var(--bg3);color:var(--text)}
+.user-btn{background:var(--accent2);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;transition:background .15s}
+.user-btn:hover{background:#6d28d9}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:200;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mnav-btn{background:none;border:none;color:var(--muted);padding:6px 16px;border-radius:8px;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;position:relative}
+.mnav-btn .micon{font-size:20px}
+.mnav-btn.active{color:var(--accent)}
+.mnav-dot{width:5px;height:5px;background:var(--red);border-radius:50%;position:absolute;top:4px;right:12px}
+
+/* PAGES */
+.page{display:none;padding:16px 20px;max-width:900px;margin:0 auto;padding-bottom:80px}
+.page.active{display:block}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:340px;max-width:90vw}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);margin-bottom:4px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.modal-tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--bg3);border-radius:8px;padding:4px}
+.mtab{flex:1;padding:7px;border:none;background:none;color:var(--muted);border-radius:6px;font-size:13px;font-weight:500;transition:all .15s}
+.mtab.active{background:var(--accent2);color:#fff}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .15s}
+.field input:focus{outline:none;border-color:var(--accent)}
+.modal-submit{width:100%;background:var(--accent2);color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:600;margin-top:4px;transition:background .15s}
+.modal-submit:hover{background:#6d28d9}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;margin-top:-4px}
+.modal-err{font-size:12px;color:var(--red);margin-bottom:10px;display:none}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a0a2e,#0a1020);border:1px solid var(--border);border-radius:12px;padding:32px 24px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 50%,rgba(192,132,252,.1),transparent 60%)}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;color:var(--accent);margin-bottom:8px}
+.hero p{color:var(--muted);font-size:14px;margin-bottom:20px}
+.hero-btn{background:var(--accent2);color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:15px;font-weight:500;transition:background .15s}
+.hero-btn:hover{background:#6d28d9}
+
+/* SEARCH + SORT */
+.search-wrap{display:flex;gap:8px;margin-bottom:14px}
+.search-wrap input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .15s}
+.search-wrap input:focus{outline:none;border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--muted)}
+.sort-sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:9px 10px;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;min-width:110px}
+.sort-sel:focus{outline:none;border-color:var(--accent)}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:#3b1d6e;border-color:var(--accent);color:var(--accent)}
+body.light .chip.on{background:#ede9fe}
+
+/* SECTION HEADER */
+.sec-hd{font-size:14px;font-weight:500;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
+.sec-hd::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* MANGA GRID */
+.manga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;margin-bottom:24px}
+.mcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s}
+.mcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mcover{height:160px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+.mcover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.mcover-emoji{position:relative;z-index:1;font-size:48px}
+.mbadge{position:absolute;top:6px;left:6px;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.5px;z-index:2}
+.badge-new{background:#1e3a1e;color:var(--green)}
+.badge-hot{background:#3a1a1a;color:var(--red)}
+.badge-trend{background:#3a2a00;color:var(--yellow)}
+.fav-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#888;transition:color .15s;z-index:2}
+.fav-btn:hover,.fav-btn.faved{color:#ec4899}
+.minfo{padding:9px 10px}
+.mtitle{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mmeta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+.star-y{color:var(--yellow)}
+
+/* DETAIL PAGE */
+.detail-top{display:flex;gap:16px;margin-bottom:18px}
+.detail-cover{width:100px;height:135px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:52px;flex-shrink:0;border:1px solid var(--border);overflow:hidden;position:relative}
+.detail-cover img{width:100%;height:100%;object-fit:cover}
+.detail-info{flex:1}
+.detail-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent);margin-bottom:4px}
+.detail-author{font-size:13px;color:var(--muted);margin-bottom:8px}
+.detail-desc{font-size:13px;color:#bbb;line-height:1.6;margin-bottom:10px}
+body.light .detail-desc{color:#444}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.genre-tag{font-size:11px;padding:3px 10px;border-radius:20px;background:#1e1440;border:1px solid #3b1d6e;color:var(--accent)}
+body.light .genre-tag{background:#ede9fe;border-color:#c4b5fd}
+.star-row{display:flex;gap:3px;margin-bottom:10px}
+.star-btn{background:none;border:none;font-size:22px;color:#333;transition:color .1s;cursor:pointer}
+.star-btn.on{color:var(--yellow)}
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.btn-primary{background:var(--accent2);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;transition:background .15s}
+.btn-primary:hover{background:#6d28d9}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:9px 18px;border-radius:8px;font-size:13px;transition:background .15s}
+.btn-secondary:hover{background:#2a2a2a}
+.btn-secondary.faved{color:#ec4899;border-color:#ec4899}
+
+/* CHAPTERS */
+.chapter-list{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:18px}
+.chap-item{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.chap-item:last-child{border-bottom:none}
+.chap-item:hover{background:var(--bg3)}
+.chap-item.read{opacity:.45}
+.chap-name{font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px}
+.chap-meta{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.read-badge{font-size:10px;padding:2px 7px;background:#1e3a1e;color:var(--green);border-radius:4px}
+.new-dot{font-size:10px;color:var(--accent)}
+
+/* READER */
+.reader-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.reader-title{font-size:13px;color:var(--muted);text-align:center}
+.reader-pages{display:flex;flex-direction:column;gap:4px}
+.reader-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:40px;font-size:120px;line-height:1}
+.page-num{text-align:center;font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:12px}
+
+/* COMMENTS */
+.comment-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px}
+.comment-hd{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.av-purple{background:#3b1d6e;color:var(--accent)}
+.av-teal{background:#1a3a30;color:#5eead4}
+.av-coral{background:#3a1a10;color:#fb923c}
+.av-pink{background:#3a1525;color:#f472b6}
+.comment-author{font-size:13px;font-weight:500;color:var(--text)}
+.comment-time{font-size:11px;color:var(--muted)}
+.comment-text{font-size:13px;color:#bbb;line-height:1.5}
+body.light .comment-text{color:#444}
+.comment-actions{display:flex;gap:12px;margin-top:8px}
+.like-btn{background:none;border:none;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;transition:color .15s}
+.like-btn:hover,.like-btn.liked{color:#ec4899}
+.add-comment{display:flex;gap:10px;margin-top:14px;align-items:flex-start}
+.add-comment textarea{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:inherit;resize:none}
+.add-comment textarea:focus{outline:none;border-color:var(--accent)}
+.add-comment textarea::placeholder{color:var(--muted)}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent);letter-spacing:1px}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* PROFILE */
+.profile-header{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:#3b1d6e;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent);flex-shrink:0}
+.profile-name{font-size:18px;font-weight:700;color:var(--text)}
+.profile-bio{font-size:13px;color:var(--muted);margin-top:3px}
+.profile-counts{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.profile-counts span{font-size:12px;color:var(--muted)}
+.profile-counts b{color:var(--text)}
+.logout-btn{background:var(--bg3);color:var(--red);border:1px solid var(--border);padding:8px 16px;border-radius:8px;font-size:13px;margin-top:10px}
+
+/* NOTIFS */
+.notif-item{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:8px}
+.notif-item.unread{border-left:2px solid var(--accent)}
+.notif-icon{width:36px;height:36px;border-radius:50%;background:#3b1d6e;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-text{font-size:13px;color:var(--text);line-height:1.4}
+.notif-time{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* FAVS */
+.fav-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:14px}
+
+/* BACK */
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:16px;background:none;border:none;padding:0;font-family:inherit;transition:color .15s}
+.back-btn:hover{color:var(--text)}
+
+/* RECENT */
+.recent-item{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.recent-item:hover{border-color:var(--accent)}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#1f1f1f;color:#f0f0f0;padding:10px 20px;border-radius:20px;font-size:13px;border:1px solid var(--border);z-index:999;opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ADMIN */
+.admin-badge{background:#7c3aed;color:#fff;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.5px;margin-left:6px}
+.admin-btn{background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;transition:opacity .15s}
+.admin-btn:hover{opacity:.85}
+.admin-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
+.admin-section h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border)}
+.admin-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--bg3)}
+.del-btn{background:none;border:1px solid var(--red);color:var(--red);padding:3px 10px;border-radius:6px;font-size:11px;transition:background .15s}
+.del-btn:hover{background:var(--red);color:#fff}
+.ban-btn{background:none;border:1px solid var(--yellow);color:var(--yellow);padding:3px 10px;border-radius:6px;font-size:11px;transition:background .15s}
+.ban-btn:hover{background:var(--yellow);color:#000}
+.admin-form{display:flex;flex-direction:column;gap:10px}
+.admin-form input,.admin-form textarea,.admin-form select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:inherit}
+.admin-form input:focus,.admin-form textarea:focus,.admin-form select:focus{outline:none;border-color:var(--accent)}
+.admin-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.admin-stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.admin-stat-num{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent)}
+.admin-stat-lbl{font-size:11px;color:var(--muted)}
+.admin-tabs{display:flex;gap:4px;margin-bottom:18px;flex-wrap:wrap}
+.admin-tab{padding:7px 16px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);border-radius:8px;font-size:12px;font-weight:500;transition:all .15s}
+.admin-tab.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.success-msg{font-size:12px;color:var(--green);margin-top:6px;display:none}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .nav{display:none}
+  .mobile-nav{display:block}
+  .page{padding:12px 14px;padding-bottom:90px}
+  .hero h1{font-size:32px}
+  .sort-sel{min-width:90px;font-size:11px}
+  .user-btn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <h2>MangaBey</h2>
+        <p id="modal-sub">Hesabına giriş yap</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="mtab active" id="tab-login" onclick="switchTab('login')">Giriş Yap</button>
+      <button class="mtab" id="tab-register" onclick="switchTab('register')">Kayıt Ol</button>
+    </div>
+    <div class="modal-err" id="modal-err"></div>
+    <div class="field"><label>Kullanıcı Adı</label><input type="text" id="f-user" placeholder="kullaniciadi"></div>
+    <div class="field" id="f-email-wrap" style="display:none"><label>E-posta</label><input type="email" id="f-email" placeholder="ornek@email.com"></div>
+    <div class="field"><label>Şifre</label><input type="password" id="f-pass" placeholder="••••••••"></div>
+    <button class="modal-submit" id="modal-submit-btn" onclick="submitAuth()">Giriş Yap</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="header">
+  <div class="logo">Manga<span>Bey</span></div>
+  <div class="nav">
+    <button class="nav-btn active" id="nb-home" onclick="showPage('home')">🏠 Ana</button>
+    <button class="nav-btn" id="nb-favs" onclick="showPage('favs')">🤍 Favori</button>
+    <button class="nav-btn" id="nb-notifs" onclick="showPage('notifs')">🔔</button>
+    <button class="nav-btn" id="nb-profile" onclick="showPage('profile')">👤 Profil</button>
+    <button class="nav-btn" id="nb-admin" onclick="showPage('admin')" style="display:none">⚙️ Yönetici</button>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir">🌙</button>
+    <button class="user-btn" id="header-user-btn" onclick="headerUserClick()">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mnav-btn active" id="mnb-home" onclick="showPage('home')"><span class="micon">🏠</span>Ana</button>
+    <button class="mnav-btn" id="mnb-favs" onclick="showPage('favs')"><span class="micon">🤍</span>Favori</button>
+    <button class="mnav-btn" id="mnb-notifs" onclick="showPage('notifs')"><span class="micon">🔔</span>Bildirim</button>
+    <button class="mnav-btn" id="mnb-profile" onclick="showPage('profile')"><span class="micon">👤</span>Profil</button>
+    <button class="mnav-btn" id="mnb-admin" onclick="showPage('admin')" style="display:none"><span class="micon">⚙️</span>Yönetici</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>MangaBey</h1>
+    <p>Türkiye'nin en iyi manga platformu — ücretsiz, reklamsız, özgün.</p>
+    <button class="hero-btn" onclick="document.getElementById('search-input').focus()">Okumaya Başla</button>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="search-input" placeholder="Manga veya yazar ara..." oninput="renderGrid()">
+    <select class="sort-sel" id="sort-sel" onchange="renderGrid()">
+      <option value="default">Varsayılan</option>
+      <option value="rating">En Yüksek Puan</option>
+      <option value="chapters">En Çok Bölüm</option>
+      <option value="az">A-Z</option>
+      <option value="za">Z-A</option>
+      <option value="newest">En Yeni</option>
+    </select>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="sec-hd">Mangalar</div>
+  <div class="manga-grid" id="manga-grid"></div>
+</div>
+
+<!-- DETAIL -->
+<div class="page" id="page-detail">
+  <button class="back-btn" onclick="showPage('home')">← Geri dön</button>
+  <div class="detail-top">
+    <div class="detail-cover" id="d-cover"></div>
+    <div class="detail-info">
+      <div class="detail-title" id="d-title"></div>
+      <div class="detail-author" id="d-author"></div>
+      <div class="tag-row" id="d-tags"></div>
+      <div class="star-row" id="d-stars"></div>
+      <div class="detail-desc" id="d-desc"></div>
+    </div>
+  </div>
+  <div class="action-row">
+    <button class="btn-primary" onclick="readFirst()">📖 Okumaya başla</button>
+    <button class="btn-secondary" id="fav-toggle-btn" onclick="toggleFav()">🤍 Favorile</button>
+  </div>
+  <div class="sec-hd">Bölümler</div>
+  <div class="chapter-list" id="d-chapters"></div>
+  <div class="sec-hd" style="margin-top:20px">Yorumlar</div>
+  <div id="comments-list"></div>
+  <div class="add-comment">
+    <div class="avatar av-purple" style="margin-top:2px" id="comment-avatar">?</div>
+    <div style="flex:1">
+      <textarea rows="2" id="comment-input" placeholder="Yorumunu yaz..."></textarea>
+      <button class="btn-primary" style="margin-top:7px;font-size:12px" onclick="addComment()">Gönder</button>
+    </div>
+  </div>
+</div>
+
+<!-- READER -->
+<div class="page" id="page-reader">
+  <button class="back-btn" id="reader-back">← Bölüm listesi</button>
+  <div class="reader-nav">
+    <button class="btn-secondary" id="prev-chap" onclick="changeChap(-1)">← Önceki</button>
+    <div class="reader-title" id="reader-prog"></div>
+    <button class="btn-secondary" id="next-chap" onclick="changeChap(1)">Sonraki →</button>
+  </div>
+  <div id="reader-pages"></div>
+</div>
+
+<!-- FAVS -->
+<div class="page" id="page-favs">
+  <div class="sec-hd">Favorilerim</div>
+  <div class="manga-grid" id="fav-grid"></div>
+  <div class="fav-empty" id="fav-empty">Henüz favori eklemedin. Manga kartlarındaki ❤️ ikonuna bas!</div>
+</div>
+
+<!-- NOTIFS -->
+<div class="page" id="page-notifs">
+  <div class="sec-hd">Bildirimler</div>
+  <div id="notif-list"></div>
+  <div id="notif-empty" style="text-align:center;padding:50px 20px;color:var(--muted);font-size:14px">Henüz bildirim yok.</div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile">
+  <div id="profile-logged-out" style="display:none;text-align:center;padding:60px 20px">
+    <div style="font-size:48px;margin-bottom:12px">👤</div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:6px;color:var(--text)">Giriş yapmadın</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Favorilerin ve okuma geçmişin kaydedilsin.</div>
+    <button class="btn-primary" onclick="openModal()">Giriş Yap / Kayıt Ol</button>
+  </div>
+  <div id="profile-logged-in">
+    <div class="profile-header">
+      <div class="profile-avatar" id="prof-avatar">MB</div>
+      <div>
+        <div class="profile-name" id="prof-name">Kullanıcı</div>
+        <div class="profile-bio">MangaBey üyesi</div>
+        <div class="profile-counts">
+          <span><b id="prof-read">0</b> bölüm okundu</span>
+          <span><b id="prof-fav">0</b> favori</span>
+          <span><b id="prof-comment">0</b> yorum</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Çıkış Yap</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="s-read">0</div><div class="stat-lbl">Okunan bölüm</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-fav">0</div><div class="stat-lbl">Favori manga</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-comment">0</div><div class="stat-lbl">Toplam yorum</div></div>
+    </div>
+    <div class="sec-hd">Son okunanlar</div>
+    <div id="recent-list"></div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="page" id="page-admin">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent)">Yönetici Paneli</div>
+    <span class="admin-badge">ADMIN</span>
+  </div>
+
+  <div class="admin-stats" id="admin-stats-row"></div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" id="atab-manga" onclick="switchAdminTab('manga')">📚 Mangalar</button>
+    <button class="admin-tab" id="atab-users" onclick="switchAdminTab('users')">👥 Kullanıcılar</button>
+    <button class="admin-tab" id="atab-comments" onclick="switchAdminTab('comments')">💬 Yorumlar</button>
+    <button class="admin-tab" id="atab-add" onclick="switchAdminTab('add')">➕ Manga Ekle</button>
+  </div>
+
+  <!-- MANGA YÖNETİM -->
+  <div id="admin-tab-manga" class="admin-tab-content">
+    <div class="admin-section">
+      <h3>📚 Manga Listesi</h3>
+      <div style="overflow-x:auto">
+        <table class="admin-table" id="admin-manga-table">
+          <thead><tr><th>ID</th><th>Başlık</th><th>Tür</th><th>Puan</th><th>Bölüm</th><th>Badge</th><th>İşlem</th></tr></thead>
+          <tbody id="admin-manga-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- KULLANICI YÖNETİM -->
+  <div id="admin-tab-users" class="admin-tab-content" style="display:none">
+    <div class="admin-section">
+      <h3>👥 Kayıtlı Kullanıcılar</h3>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Kullanıcı Adı</th><th>Durum</th><th>İşlem</th></tr></thead>
+          <tbody id="admin-users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- YORUM YÖNETİM -->
+  <div id="admin-tab-comments" class="admin-tab-content" style="display:none">
+    <div class="admin-section">
+      <h3>💬 Tüm Yorumlar</h3>
+      <div id="admin-comments-list"></div>
+    </div>
+  </div>
+
+  <!-- MANGA EKLE -->
+  <div id="admin-tab-add" class="admin-tab-content" style="display:none">
+    <div class="admin-section">
+      <h3>➕ Yeni Manga Ekle</h3>
+      <div class="admin-form">
+        <div class="admin-form-row">
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Başlık</label><input type="text" id="add-title" placeholder="Manga adı"></div>
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Yazar</label><input type="text" id="add-author" placeholder="Yazar adı"></div>
+        </div>
+        <div class="admin-form-row">
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Tür</label>
+            <select id="add-genre"><option>Aksiyon</option><option>Fantezi</option><option>Korku</option><option>Romantik</option><option>Komedi</option><option>Drama</option><option>Sci-Fi</option></select>
+          </div>
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Badge</label>
+            <select id="add-badge"><option value="">Yok</option><option>Yeni</option><option>Hot</option><option>Trend</option></select>
+          </div>
+        </div>
+        <div class="admin-form-row">
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Bölüm Sayısı</label><input type="number" id="add-chapters" placeholder="10" min="1"></div>
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Puan (1-5)</label><input type="number" id="add-rating" placeholder="4.5" min="1" max="5" step="0.1"></div>
+        </div>
+        <div class="admin-form-row">
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">İkon (emoji)</label><input type="text" id="add-icon" placeholder="⚔️"></div>
+          <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Etiketler (virgülle)</label><input type="text" id="add-tags" placeholder="Aksiyon, Fantezi"></div>
+        </div>
+        <div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:5px">Açıklama</label><textarea id="add-desc" rows="3" placeholder="Manga açıklaması..."></textarea></div>
+        <button class="admin-btn" onclick="adminAddManga()" style="align-self:flex-start;padding:10px 24px">Mangayı Ekle</button>
+        <div class="success-msg" id="add-success">✅ Manga başarıyla eklendi!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── VERİ ───────────────────────────────────────────────
+const mangas = [
+  {id:0,title:"Gölge Avcısı",author:"İstanbul Beyefendisi",genre:"Aksiyon",icon:"⚔️",bg:"#1a0a2e",badge:"Yeni",rating:4.8,desc:"Karanlığa karışan bir avcının, geçmişiyle yüzleşme hikayesi. Nefes kesen dövüşler ve derin karakter gelişimi.",chapters:12,tags:["Aksiyon","Macera","Fantezi"],img:"https://picsum.photos/seed/manga0/200/280"},
+  {id:1,title:"Kristal Vadi",author:"İstanbul Beyefendisi",genre:"Fantezi",icon:"🔮",bg:"#0a1e1a",badge:null,rating:4.6,desc:"Büyülü bir vadide uyanan genç bir büyücünün kayıp kimliğini arama yolculuğu.",chapters:8,tags:["Fantezi","Gizem"],img:"https://picsum.photos/seed/manga1/200/280"},
+  {id:2,title:"Son Gün",author:"İstanbul Beyefendisi",genre:"Korku",icon:"🌑",bg:"#1e0a0a",badge:"Trend",rating:4.5,desc:"Küçük bir kasabayı kasıp kavuran gizemli olayların ardındaki karanlık sır.",chapters:5,tags:["Korku","Gerilim"],img:"https://picsum.photos/seed/manga2/200/280"},
+  {id:3,title:"Yıldız Kız",author:"İstanbul Beyefendisi",genre:"Romantik",icon:"⭐",bg:"#1e0a1a",badge:null,rating:4.9,desc:"İki genç arasında kader tarafından yazılmış imkansız bir aşk hikayesi.",chapters:20,tags:["Romantik","Drama"],img:"https://picsum.photos/seed/manga3/200/280"},
+  {id:4,title:"Çılgın Şef",author:"İstanbul Beyefendisi",genre:"Komedi",icon:"🍜",bg:"#1e1500",badge:null,rating:4.7,desc:"En büyük restoranı açmak isteyen kaosu seven genç bir aşçının macerası.",chapters:15,tags:["Komedi","Günlük"],img:"https://picsum.photos/seed/manga4/200/280"},
+  {id:5,title:"Demir Orman",author:"İstanbul Beyefendisi",genre:"Fantezi",icon:"🌲",bg:"#0a1e0a",badge:"Yeni",rating:4.4,desc:"Metalik ağaçlarla dolu, insanların giremediği bir ormanda saklanan antik bir sır.",chapters:9,tags:["Fantezi","Aksiyon"],img:"https://picsum.photos/seed/manga5/200/280"},
+  {id:6,title:"Rüzgar Savaşçı",author:"İstanbul Beyefendisi",genre:"Aksiyon",icon:"💨",bg:"#0a1020",badge:"Hot",rating:4.3,desc:"Rüzgarı kontrol edebilen tek savaşçının imparatorluğu kurtarma mücadelesi.",chapters:11,tags:["Aksiyon","Fantezi"],img:"https://picsum.photos/seed/manga6/200/280"},
+  {id:7,title:"Gece Müzisyeni",author:"İstanbul Beyefendisi",genre:"Drama",icon:"🎸",bg:"#1a0a1e",badge:null,rating:4.6,desc:"Müziğini yitirmiş bir dahinin kendini yeniden bulma yolculuğu.",chapters:7,tags:["Drama","Müzik"],img:"https://picsum.photos/seed/manga7/200/280"},
+  {id:8,title:"Kızıl Ay",author:"Yıldız Demir",genre:"Aksiyon",icon:"🌙",bg:"#200a10",badge:"Hot",rating:4.7,desc:"Kızıl ayla birlikte uyanışa geçen savaşçıların destansı mücadelesi.",chapters:18,tags:["Aksiyon","Fantezi","Gizem"],img:"https://picsum.photos/seed/manga8/200/280"},
+  {id:9,title:"Dijital Rüya",author:"Neon Kaya",genre:"Sci-Fi",icon:"🤖",bg:"#0a0a20",badge:"Yeni",rating:4.5,desc:"Sanal dünyaya hapsolmuş bir programcının gerçek ile sanal arasındaki savaşı.",chapters:10,tags:["Sci-Fi","Gerilim"],img:"https://picsum.photos/seed/manga9/200/280"},
+  {id:10,title:"Çiçek Savaşı",author:"İpek Yıldız",genre:"Romantik",icon:"🌸",bg:"#1e0518",badge:null,rating:4.8,desc:"Düşman ailelerin çocuklarının yasak aşkının çiçek festivalinde başlaması.",chapters:14,tags:["Romantik","Drama","Komedi"],img:"https://picsum.photos/seed/manga10/200/280"},
+  {id:11,title:"Karanlık Okul",author:"İstanbul Beyefendisi",genre:"Korku",icon:"🏫",bg:"#10100a",badge:"Trend",rating:4.2,desc:"Tarihi bir okulda gece yarısı başlayan olaylar öğrencileri paniğe sürüklüyor.",chapters:6,tags:["Korku","Gizem"],img:"https://picsum.photos/seed/manga11/200/280"},
+];
+
+let comments_db = {};
+
+const notifs = [];
+
+const genres = ["Tümü","Aksiyon","Fantezi","Korku","Romantik","Komedi","Drama","Sci-Fi"];
+const pageEmojis={"⚔️":["⚔️","🌑","💢","🔥","⚡"],"🔮":["🔮","✨","🌿","🌌","💫"],"🌑":["🌑","👁️","🕯️","😱","🌫️"],"⭐":["⭐","💌","🌸","💫","🌙"],"🍜":["🍜","🔪","💥","😂","🍳"],"🌲":["🌲","⚙️","💡","🌿","🔩"],"💨":["💨","🌪️","⚡","🏹","🌊"],"🎸":["🎸","🎵","🎶","🎤","🎹"],"🌙":["🌙","🔴","⚔️","✨","🌑"],"🤖":["🤖","💻","⚡","🔮","🌐"],"🌸":["🌸","💕","🌼","🦋","✨"],"🏫":["🏫","👻","🕯️","😱","🌑"]};
+
+// ─── STATE ──────────────────────────────────────────────
+let favs = new Set();
+let readChaps = {};
+let commentCount = 0;
+let currentManga = null;
+let currentChap = 1;
+let activeGenre = "Tümü";
+let userRatings = {};
+let currentUser = null;
+let modalMode = 'login';
+
+// ─── LOCALSTORAGE ────────────────────────────────────────
+function saveLS(){
+  try{
+    const data={favs:[...favs],readChaps:Object.fromEntries(Object.entries(readChaps).map(([k,v])=>[k,[...v]])),commentCount,userRatings,comments_db};
+    localStorage.setItem('mangabey_data',JSON.stringify(data));
+    const u=localStorage.getItem('mangabey_user');
+    if(!u&&currentUser){localStorage.setItem('mangabey_user',JSON.stringify(currentUser));}
+  }catch(e){}
+}
+
+function loadLS(){
+  try{
+    const raw=localStorage.getItem('mangabey_data');
+    if(raw){
+      const d=JSON.parse(raw);
+      if(d.favs)favs=new Set(d.favs);
+      if(d.readChaps){readChaps={};Object.entries(d.readChaps).forEach(([k,v])=>{readChaps[k]=new Set(v);});}
+      if(d.commentCount)commentCount=d.commentCount;
+      if(d.userRatings)userRatings=d.userRatings;
+      if(d.comments_db)comments_db=d.comments_db;
+    }
+    const u=localStorage.getItem('mangabey_user');
+    if(u){currentUser=JSON.parse(u);applyUser();}
+    const theme=localStorage.getItem('mangabey_theme');
+    if(theme==='light'){document.body.classList.add('light');document.getElementById('theme-toggle').textContent='☀️';}
+  }catch(e){}
+}
+
+// ─── AUTH ────────────────────────────────────────────────
+function openModal(){
+  document.getElementById('login-modal').classList.add('open');
+  switchTab('login');
+}
+function closeModal(){document.getElementById('login-modal').classList.remove('open');}
+function switchTab(t){
+  modalMode=t;
+  document.getElementById('tab-login').className='mtab'+(t==='login'?' active':'');
+  document.getElementById('tab-register').className='mtab'+(t==='register'?' active':'');
+  document.getElementById('f-email-wrap').style.display=t==='register'?'block':'none';
+  document.getElementById('modal-submit-btn').textContent=t==='login'?'Giriş Yap':'Kayıt Ol';
+  document.getElementById('modal-sub').textContent=t==='login'?'Hesabına giriş yap':'Yeni hesap oluştur';
+  document.getElementById('modal-err').style.display='none';
+}
+function submitAuth(){
+  const user=document.getElementById('f-user').value.trim();
+  const pass=document.getElementById('f-pass').value;
+  const err=document.getElementById('modal-err');
+  if(!user||!pass){err.textContent='Kullanıcı adı ve şifre gerekli.';err.style.display='block';return;}
+  if(user===ADMIN_USER&&pass===ADMIN_PASS){
+    currentUser={username:ADMIN_USER,isAdmin:true};
+    localStorage.setItem('mangabey_user',JSON.stringify(currentUser));
+    applyUser();closeModal();showToast('Hoşgeldin, Yönetici! 👑');updateStats();return;
+  }
+  if(modalMode==='register'){
+    if(user===ADMIN_USER){err.textContent='Bu kullanıcı adı kullanılamaz.';err.style.display='block';return;}
+    const existing=JSON.parse(localStorage.getItem('mangabey_users')||'{}');
+    if(existing[user]){err.textContent='Bu kullanıcı adı zaten alınmış.';err.style.display='block';return;}
+    existing[user]={pass,email:document.getElementById('f-email').value};
+    localStorage.setItem('mangabey_users',JSON.stringify(existing));
+    currentUser={username:user};
+  } else {
+    const existing=JSON.parse(localStorage.getItem('mangabey_users')||'{}');
+    if(!existing[user]||existing[user].pass!==pass){err.textContent='Kullanıcı adı veya şifre hatalı.';err.style.display='block';return;}
+    const banned=JSON.parse(localStorage.getItem('mangabey_banned')||'[]');
+    if(banned.includes(user)){err.textContent='Bu hesap banlanmış. Yöneticiyle iletişime geç.';err.style.display='block';return;}
+    currentUser={username:user};
+  }
+  localStorage.setItem('mangabey_user',JSON.stringify(currentUser));
+  applyUser();closeModal();showToast('Hoşgeldin, '+user+'! 👋');updateStats();
+}
+function applyUser(){
+  if(!currentUser)return;
+  const u=currentUser.username;
+  document.getElementById('header-user-btn').textContent=u;
+  document.getElementById('prof-name').textContent=u;
+  document.getElementById('prof-avatar').textContent=u.slice(0,2).toUpperCase();
+  document.getElementById('comment-avatar').textContent=u.slice(0,2).toUpperCase();
+  document.getElementById('profile-logged-out').style.display='none';
+  document.getElementById('profile-logged-in').style.display='block';
+  showAdminNav(isAdmin());
+}
+function logout(){
+  currentUser=null;
+  localStorage.removeItem('mangabey_user');
+  document.getElementById('header-user-btn').textContent='Giriş Yap';
+  document.getElementById('profile-logged-out').style.display='block';
+  document.getElementById('profile-logged-in').style.display='none';
+  showAdminNav(false);
+  showPage('home');
+  showToast('Çıkış yapıldı.');
+}
+function headerUserClick(){
+  if(currentUser){showPage('profile');}else{openModal();}
+}
+
+// ─── THEME ───────────────────────────────────────────────
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  const isLight=document.body.classList.contains('light');
+  document.getElementById('theme-toggle').textContent=isLight?'☀️':'🌙';
+  localStorage.setItem('mangabey_theme',isLight?'light':'dark');
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ─── INIT ────────────────────────────────────────────────
+function init(){
+  loadLS();
+  const fr=document.getElementById('filter-row');
+  genres.forEach(g=>{
+    const c=document.createElement('div');
+    c.className='chip'+(g==="Tümü"?' on':'');
+    c.textContent=g;
+    c.onclick=()=>{
+      document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      activeGenre=g;
+      renderGrid();
+    };
+    fr.appendChild(c);
+  });
+  renderGrid();
+  renderNotifs();
+  updateStats();
+  if(!currentUser){
+    document.getElementById('profile-logged-out').style.display='block';
+    document.getElementById('profile-logged-in').style.display='none';
+  }
+  // Close modal on overlay click
+  document.getElementById('login-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+}
+
+// ─── GRID ────────────────────────────────────────────────
+function renderGrid(){
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const sort=document.getElementById('sort-sel').value;
+  const grid=document.getElementById('manga-grid');
+  grid.innerHTML='';
+  let list=mangas.filter(m=>{
+    const ok=activeGenre==="Tümü"||m.genre===activeGenre;
+    const sq=!q||m.title.toLowerCase().includes(q)||m.author.toLowerCase().includes(q)||m.tags.some(t=>t.toLowerCase().includes(q));
+    return ok&&sq;
+  });
+  if(sort==='rating')list=[...list].sort((a,b)=>b.rating-a.rating);
+  else if(sort==='chapters')list=[...list].sort((a,b)=>b.chapters-a.chapters);
+  else if(sort==='az')list=[...list].sort((a,b)=>a.title.localeCompare(b.title,'tr'));
+  else if(sort==='za')list=[...list].sort((a,b)=>b.title.localeCompare(a.title,'tr'));
+  else if(sort==='newest')list=[...list].reverse();
+  if(list.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:14px">Sonuç bulunamadı 😕</div>';return;}
+  list.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='mcard';
+    const faved=favs.has(m.id);
+    d.innerHTML=`<div class="mcover" style="background:${m.bg}">
+      <img src="${m.img}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'">
+      <span class="mcover-emoji">${m.icon}</span>
+      ${m.badge?`<div class="mbadge ${m.badge==='Yeni'?'badge-new':m.badge==='Hot'?'badge-hot':'badge-trend'}">${m.badge}</div>`:''}
+      <button class="fav-btn${faved?' faved':''}" onclick="event.stopPropagation();quickFav(${m.id},this)">${faved?'❤️':'🤍'}</button>
+    </div>
+    <div class="minfo">
+      <div class="mtitle">${m.title}</div>
+      <div class="mmeta"><span>${m.genre}</span><span class="star-y">★ ${m.rating}</span></div>
+    </div>`;
+    d.onclick=()=>openDetail(m.id);
+    grid.appendChild(d);
+  });
+}
+
+function quickFav(id,btn){
+  if(favs.has(id)){favs.delete(id);btn.textContent='🤍';btn.classList.remove('faved');showToast('Favoriden çıkarıldı');}
+  else{favs.add(id);btn.textContent='❤️';btn.classList.add('faved');showToast('Favorilere eklendi ❤️');}
+  saveLS();updateStats();
+}
+
+// ─── DETAIL ──────────────────────────────────────────────
+function openDetail(id){
+  currentManga=mangas[id];
+  const cover=document.getElementById('d-cover');
+  cover.style.background=currentManga.bg;
+  cover.innerHTML=`<img src="${currentManga.img}" alt="${currentManga.title}" onerror="this.outerHTML='<span style=font-size:52px>${currentManga.icon}</span>'">`;
+  document.getElementById('d-title').textContent=currentManga.title;
+  document.getElementById('d-author').textContent='Yazar: '+currentManga.author;
+  document.getElementById('d-desc').textContent=currentManga.desc;
+  document.getElementById('d-tags').innerHTML=currentManga.tags.map(t=>`<span class="genre-tag">${t}</span>`).join('');
+  renderStars(id);renderChapters(id);renderComments(id);
+  const fb=document.getElementById('fav-toggle-btn');
+  fb.textContent=favs.has(id)?'❤️ Favoriden çıkar':'🤍 Favorile';
+  fb.className='btn-secondary'+(favs.has(id)?' faved':'');
+  showPage('detail');
+}
+
+function renderStars(id){
+  const r=document.getElementById('d-stars');
+  const cur=userRatings[id]||0;
+  r.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const b=document.createElement('button');
+    b.className='star-btn'+(i<=cur?' on':'');
+    b.textContent='★';
+    const v=i;
+    b.onclick=()=>{userRatings[id]=v;renderStars(id);saveLS();showToast('Puan verildi: '+v+'/5 ⭐');};
+    r.appendChild(b);
+  }
+}
+
+function renderChapters(id){
+  const list=document.getElementById('d-chapters');
+  list.innerHTML='';
+  const total=currentManga.chapters;
+  const read=readChaps[id]||new Set();
+  for(let i=total;i>=1;i--){
+    const d=document.createElement('div');
+    d.className='chap-item'+(read.has(i)?' read':'');
+    d.innerHTML=`<span class="chap-name">Bölüm ${i}${i===total?' <span class="new-dot">● Yeni</span>':''}</span>
+    <span class="chap-meta">${read.has(i)?'<span class="read-badge">Okundu</span>':''}<span>${total-i+1} gün önce</span> →</span>`;
+    d.onclick=()=>openReader(id,i);
+    list.appendChild(d);
+  }
+}
+
+function renderComments(id){
+  const list=document.getElementById('comments-list');
+  const arr=comments_db[id]||[];
+  list.innerHTML='';
+  arr.forEach((c,ci)=>{
+    const d=document.createElement('div');
+    d.className='comment-box';
+    d.innerHTML=`<div class="comment-hd"><div class="avatar ${c.av}">${c.init}</div><div><div class="comment-author">${c.name}</div><div class="comment-time">${c.time}</div></div></div>
+    <div class="comment-text">${c.text}</div>
+    <div class="comment-actions"><button class="like-btn${c.liked?' liked':''}" onclick="likeComment(${id},${ci},this)">❤️ ${c.likes}</button></div>`;
+    list.appendChild(d);
+  });
+}
+
+function likeComment(mid,ci,btn){
+  const c=comments_db[mid][ci];
+  c.liked=!c.liked;c.likes+=c.liked?1:-1;
+  btn.className='like-btn'+(c.liked?' liked':'');
+  btn.innerHTML=`❤️ ${c.likes}`;
+  saveLS();
+}
+
+function addComment(){
+  if(!currentUser){showToast('Yorum yapmak için giriş yapmalısın!');openModal();return;}
+  const inp=document.getElementById('comment-input');
+  const text=inp.value.trim();
+  if(!text||!currentManga)return;
+  const id=currentManga.id;
+  if(!comments_db[id])comments_db[id]=[];
+  const u=currentUser.username;
+  const av=["av-purple","av-teal","av-coral","av-pink"][u.charCodeAt(0)%4];
+  comments_db[id].unshift({av,init:u.slice(0,2).toUpperCase(),name:u,time:"Az önce",text,likes:0,liked:false});
+  inp.value='';commentCount++;
+  renderComments(id);updateStats();saveLS();
+  showToast('Yorumun eklendi! 💬');
+}
+
+function toggleFav(){
+  if(!currentManga)return;
+  const id=currentManga.id;
+  if(favs.has(id)){favs.delete(id);showToast('Favoriden çıkarıldı');}
+  else{favs.add(id);showToast('Favorilere eklendi ❤️');}
+  const fb=document.getElementById('fav-toggle-btn');
+  fb.textContent=favs.has(id)?'❤️ Favoriden çıkar':'🤍 Favorile';
+  fb.className='btn-secondary'+(favs.has(id)?' faved':'');
+  saveLS();updateStats();
+}
+
+function readFirst(){if(currentManga)openReader(currentManga.id,1);}
+
+// ─── READER ──────────────────────────────────────────────
+function openReader(mid,chap){
+  currentManga=mangas[mid];currentChap=chap;
+  if(!readChaps[mid])readChaps[mid]=new Set();
+  readChaps[mid].add(chap);
+  document.getElementById('reader-back').onclick=()=>openDetail(mid);
+  renderReader();showPage('reader');saveLS();updateStats();
+}
+
+function renderReader(){
+  const m=currentManga;
+  document.getElementById('reader-prog').textContent=`${m.title} — Bölüm ${currentChap} / ${m.chapters}`;
+  document.getElementById('prev-chap').disabled=currentChap<=1;
+  document.getElementById('next-chap').disabled=currentChap>=m.chapters;
+  const pages=document.getElementById('reader-pages');
+  const emojis=pageEmojis[m.icon]||["📖","📖","📖"];
+  pages.innerHTML='';
+  for(let p=1;p<=4;p++){
+    const wrap=document.createElement('div');
+    wrap.innerHTML=`<div class="reader-panel">${emojis[(p-1)%emojis.length]}</div><div class="page-num">Sayfa ${p}</div>`;
+    pages.appendChild(wrap);
+  }
+}
+
+function changeChap(dir){
+  if(!currentManga)return;
+  const n=currentChap+dir;
+  if(n<1||n>currentManga.chapters)return;
+  openReader(currentManga.id,n);
+}
+
+// ─── NOTIFS ──────────────────────────────────────────────
+function renderNotifs(){
+  const list=document.getElementById('notif-list');
+  const empty=document.getElementById('notif-empty');
+  if(!notifs.length){empty.style.display='block';return;}
+  empty.style.display='none';
+  notifs.forEach(n=>{
+    const d=document.createElement('div');
+    d.className='notif-item'+(n.unread?' unread':'');
+    d.innerHTML=`<div class="notif-icon">${n.icon}</div><div><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div>`;
+    list.appendChild(d);
+  });
+}
+
+// ─── STATS ───────────────────────────────────────────────
+function updateStats(){
+  const total=Object.values(readChaps).reduce((a,s)=>a+s.size,0);
+  document.getElementById('s-read').textContent=total;
+  document.getElementById('s-fav').textContent=favs.size;
+  document.getElementById('s-comment').textContent=commentCount;
+  document.getElementById('prof-read').textContent=total;
+  document.getElementById('prof-fav').textContent=favs.size;
+  document.getElementById('prof-comment').textContent=commentCount;
+  renderFavs();renderRecent();
+}
+
+function renderFavs(){
+  const grid=document.getElementById('fav-grid');
+  const empty=document.getElementById('fav-empty');
+  grid.innerHTML='';
+  if(favs.size===0){empty.style.display='block';return;}
+  empty.style.display='none';
+  mangas.filter(m=>favs.has(m.id)).forEach(m=>{
+    const d=document.createElement('div');
+    d.className='mcard';
+    d.innerHTML=`<div class="mcover" style="background:${m.bg}"><img src="${m.img}" alt="${m.title}" loading="lazy" onerror="this.style.display='none'"><span class="mcover-emoji">${m.icon}</span></div>
+    <div class="minfo"><div class="mtitle">${m.title}</div><div class="mmeta"><span>${m.genre}</span><span class="star-y">★ ${m.rating}</span></div></div>`;
+    d.onclick=()=>openDetail(m.id);
+    grid.appendChild(d);
+  });
+}
+
+function renderRecent(){
+  const list=document.getElementById('recent-list');
+  const entries=[];
+  Object.entries(readChaps).forEach(([mid,set])=>{set.forEach(chap=>entries.push({mid:parseInt(mid),chap}));});
+  if(entries.length===0){list.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0">Henüz okuma yapmadın.</div>';return;}
+  list.innerHTML='';
+  entries.slice(-5).reverse().forEach(({mid,chap})=>{
+    const m=mangas[mid];if(!m)return;
+    const d=document.createElement('div');
+    d.className='recent-item';
+    d.innerHTML=`<div style="font-size:30px;background:${m.bg};width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;position:relative"><img src="${m.img}" style="width:100%;height:100%;object-fit:cover;position:absolute" onerror="this.style.display='none'"><span style="position:relative;z-index:1">${m.icon}</span></div>
+    <div><div style="font-size:13px;font-weight:500;color:var(--text)">${m.title}</div><div style="font-size:12px;color:var(--muted)">Bölüm ${chap}</div></div>`;
+    d.onclick=()=>openReader(mid,chap);
+    list.appendChild(d);
+  });
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────
+function showPage(p){
+  if(p==='admin'&&!isAdmin()){showToast('Bu sayfaya erişim yok.');return;}
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  ['home','favs','notifs','profile','admin'].forEach(id=>{
+    const nb=document.getElementById('nb-'+id);
+    const mnb=document.getElementById('mnb-'+id);
+    if(nb)nb.classList.remove('active');
+    if(mnb)mnb.classList.remove('active');
+  });
+  const map={home:'home',favs:'favs',notifs:'notifs',profile:'profile',admin:'admin'};
+  if(map[p]){
+    const nb=document.getElementById('nb-'+map[p]);
+    const mnb=document.getElementById('mnb-'+map[p]);
+    if(nb)nb.classList.add('active');
+    if(mnb)mnb.classList.add('active');
+  }
+  if(p==='admin'){renderAdminStats();renderAdminMangas();}
+  window.scrollTo(0,0);
+}
+
+// ─── ADMIN ───────────────────────────────────────────────
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'mangabey2024';
+
+function isAdmin(){return currentUser && currentUser.username === ADMIN_USER;}
+
+function showAdminNav(show){
+  ['nb-admin','mnb-admin'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display=show?'':'none';
+  });
+}
+
+function switchAdminTab(tab){
+  ['manga','users','comments','add'].forEach(t=>{
+    document.getElementById('atab-'+t).className='admin-tab'+(t===tab?' active':'');
+    document.getElementById('admin-tab-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='manga')renderAdminMangas();
+  if(tab==='users')renderAdminUsers();
+  if(tab==='comments')renderAdminComments();
+}
+
+function renderAdminStats(){
+  const users=Object.keys(JSON.parse(localStorage.getItem('mangabey_users')||'{}')).length;
+  const totalComments=Object.values(comments_db).reduce((a,v)=>a+v.length,0);
+  const totalRead=Object.values(readChaps).reduce((a,s)=>a+s.size,0);
+  const el=document.getElementById('admin-stats-row');
+  el.innerHTML=`
+    <div class="admin-stat"><div class="admin-stat-num">${mangas.length}</div><div class="admin-stat-lbl">Manga</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${users+1}</div><div class="admin-stat-lbl">Kullanıcı</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${totalComments}</div><div class="admin-stat-lbl">Yorum</div></div>
+    <div class="admin-stat"><div class="admin-stat-num">${totalRead}</div><div class="admin-stat-lbl">Okuma</div></div>`;
+}
+
+function renderAdminMangas(){
+  const tbody=document.getElementById('admin-manga-tbody');
+  tbody.innerHTML='';
+  mangas.forEach((m,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${m.id}</td><td style="font-weight:600">${m.icon} ${m.title}</td><td>${m.genre}</td><td class="star-y">★ ${m.rating}</td><td>${m.chapters}</td>
+    <td>${m.badge?`<span class="mbadge badge-${m.badge==='Yeni'?'new':m.badge==='Hot'?'hot':'trend'}" style="position:static;display:inline-block">${m.badge}</span>`:'-'}</td>
+    <td><button class="del-btn" onclick="adminDelManga(${i})">Sil</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function adminDelManga(idx){
+  if(!confirm(`"${mangas[idx].title}" mangasını silmek istiyor musun?`))return;
+  mangas.splice(idx,1);
+  mangas.forEach((m,i)=>m.id=i);
+  renderAdminMangas();renderAdminStats();renderGrid();
+  showToast('Manga silindi.');saveLS();
+}
+
+function renderAdminUsers(){
+  const tbody=document.getElementById('admin-users-tbody');
+  tbody.innerHTML='';
+  const users=JSON.parse(localStorage.getItem('mangabey_users')||'{}');
+  const banned=JSON.parse(localStorage.getItem('mangabey_banned')||'[]');
+  // admin always first
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><b>admin</b> <span class="admin-badge">ADMIN</span></td><td style="color:var(--green)">Aktif</td><td>-</td>`;
+  tbody.appendChild(tr);
+  Object.keys(users).forEach(u=>{
+    const isBanned=banned.includes(u);
+    const tr2=document.createElement('tr');
+    tr2.innerHTML=`<td>${u}</td><td style="color:${isBanned?'var(--red)':'var(--green)'}">${isBanned?'Banlı':'Aktif'}</td>
+    <td style="display:flex;gap:6px">
+      <button class="ban-btn" onclick="adminToggleBan('${u}')">${isBanned?'Banı Kaldır':'Banla'}</button>
+      <button class="del-btn" onclick="adminDelUser('${u}')">Sil</button>
+    </td>`;
+    tbody.appendChild(tr2);
+  });
+  if(Object.keys(users).length===0){
+    const empty=document.createElement('tr');
+    empty.innerHTML=`<td colspan="3" style="color:var(--muted);text-align:center;padding:20px">Henüz kayıtlı kullanıcı yok.</td>`;
+    tbody.appendChild(empty);
+  }
+}
+
+function adminToggleBan(u){
+  const banned=JSON.parse(localStorage.getItem('mangabey_banned')||'[]');
+  const idx=banned.indexOf(u);
+  if(idx>-1){banned.splice(idx,1);showToast(u+' banı kaldırıldı.');}
+  else{banned.push(u);showToast(u+' banlandı.');}
+  localStorage.setItem('mangabey_banned',JSON.stringify(banned));
+  renderAdminUsers();
+}
+
+function adminDelUser(u){
+  if(!confirm(`"${u}" kullanıcısını silmek istiyor musun?`))return;
+  const users=JSON.parse(localStorage.getItem('mangabey_users')||'{}');
+  delete users[u];
+  localStorage.setItem('mangabey_users',JSON.stringify(users));
+  showToast(u+' silindi.');renderAdminUsers();renderAdminStats();
+}
+
+function renderAdminComments(){
+  const el=document.getElementById('admin-comments-list');
+  el.innerHTML='';
+  let found=false;
+  Object.entries(comments_db).forEach(([mid,arr])=>{
+    const m=mangas[parseInt(mid)];
+    if(!m||!arr.length)return;
+    found=true;
+    arr.forEach((c,ci)=>{
+      const d=document.createElement('div');
+      d.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px';
+      d.innerHTML=`<div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">${m.icon} ${m.title} — <b>${c.name}</b> · ${c.time}</div>
+      <div style="font-size:13px;color:var(--text)">${c.text}</div></div>
+      <button class="del-btn" style="flex-shrink:0" onclick="adminDelComment(${mid},${ci})">Sil</button>`;
+      el.appendChild(d);
+    });
+  });
+  if(!found)el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Henüz yorum yok.</div>';
+}
+
+function adminDelComment(mid,ci){
+  comments_db[mid].splice(ci,1);
+  renderAdminComments();renderAdminStats();saveLS();
+  showToast('Yorum silindi.');
+}
+
+function adminAddManga(){
+  const title=document.getElementById('add-title').value.trim();
+  const author=document.getElementById('add-author').value.trim();
+  const genre=document.getElementById('add-genre').value;
+  const badge=document.getElementById('add-badge').value||null;
+  const chapters=parseInt(document.getElementById('add-chapters').value)||10;
+  const rating=parseFloat(document.getElementById('add-rating').value)||4.5;
+  const icon=document.getElementById('add-icon').value.trim()||'📖';
+  const tags=document.getElementById('add-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const desc=document.getElementById('add-desc').value.trim();
+  if(!title||!author){showToast('Başlık ve yazar zorunlu!');return;}
+  const newId=mangas.length;
+  const bgColors=['#1a0a2e','#0a1e1a','#1e0a0a','#1e0a1a','#1e1500','#0a1e0a','#0a1020','#1a0a1e'];
+  mangas.push({id:newId,title,author,genre,icon,bg:bgColors[newId%bgColors.length],badge,rating,desc,chapters,tags:tags.length?tags:[genre],img:`https://picsum.photos/seed/manga${newId}/200/280`});
+  ['add-title','add-author','add-chapters','add-rating','add-icon','add-tags','add-desc'].forEach(id=>document.getElementById(id).value='');
+  const s=document.getElementById('add-success');s.style.display='block';setTimeout(()=>s.style.display='none',2500);
+  renderGrid();renderAdminStats();saveLS();
+}
+
+init();
+</script>
+</body>
+</html>
